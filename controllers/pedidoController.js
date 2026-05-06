@@ -1,10 +1,25 @@
 const Pedido = require('../models/Pedido')
 const Produto = require('../models/Produto')
 
+// Criar pedido
 const criarPedido = async (req, res) => {
   try {
-    const { produtoId, quantidade, enderecoEntrega, formaPagamento, precisaTroco, valorPagamento } = req.body
+    const { 
+      produtoId, 
+      quantidade, 
+      cep,
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado,
+      formaPagamento, 
+      precisaTroco, 
+      valorPagamento 
+    } = req.body
 
+    // Busca o produto para pegar o preço atual
     const produto = await Produto.findById(produtoId)
     if (!produto) {
       return res.status(404).json({ mensagem: 'Produto não encontrado' })
@@ -13,8 +28,10 @@ const criarPedido = async (req, res) => {
       return res.status(400).json({ mensagem: 'Produto não está disponível' })
     }
 
+    // Calcula o valor total do pedido
     const valorTotal = produto.preco * quantidade
 
+    // Calcula o troco se necessário
     let troco = 0
     if (precisaTroco && valorPagamento > 0) {
       troco = valorPagamento - valorTotal
@@ -23,11 +40,18 @@ const criarPedido = async (req, res) => {
       }
     }
 
+    // Cria o pedido
     const pedido = await Pedido.create({
       cliente: req.usuario.id,
       produto: produtoId,
       quantidade,
-      enderecoEntrega,
+      cep,
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado,
       formaPagamento,
       precisaTroco,
       valorPagamento,
@@ -35,8 +59,9 @@ const criarPedido = async (req, res) => {
       valorTotal
     })
 
+    // Retorna o pedido completo
     const pedidoCompleto = await Pedido.findById(pedido._id)
-      .populate('cliente', 'nome email endereco')
+      .populate('cliente', 'nome email')
       .populate('produto', 'nome preco')
 
     res.status(201).json({ mensagem: 'Pedido criado com sucesso', pedido: pedidoCompleto })
@@ -45,10 +70,11 @@ const criarPedido = async (req, res) => {
   }
 }
 
+// Listar todos os pedidos
 const listarTodosPedidos = async (req, res) => {
   try {
     const pedidos = await Pedido.find()
-      .populate('cliente', 'nome email endereco')
+      .populate('cliente', 'nome email')
       .populate('produto', 'nome preco')
       .sort({ createdAt: -1 })
     res.json(pedidos)
@@ -57,6 +83,7 @@ const listarTodosPedidos = async (req, res) => {
   }
 }
 
+// Listar pedidos do cliente logado
 const meusPedidos = async (req, res) => {
   try {
     const pedidos = await Pedido.find({ cliente: req.usuario.id })
@@ -68,6 +95,7 @@ const meusPedidos = async (req, res) => {
   }
 }
 
+// Atualizar status do pedido
 const atualizarStatus = async (req, res) => {
   try {
     const { status } = req.body
@@ -77,7 +105,7 @@ const atualizarStatus = async (req, res) => {
       { status },
       { new: true }
     )
-      .populate('cliente', 'nome email endereco')
+      .populate('cliente', 'nome email')
       .populate('produto', 'nome preco')
 
     if (!pedido) {

@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const pedidoSchema = new mongoose.Schema({
   cliente: {
-    type: mongoose.Schema.Types.ObjectId, // referência ao ID do usuário
-    ref: 'Usuario',                        // diz que é referência ao model Usuario
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
     required: true
   },
   produto: {
@@ -16,7 +16,32 @@ const pedidoSchema = new mongoose.Schema({
     required: true,
     min: 1
   },
-  enderecoEntrega: {
+  // Endereço de entrega separado
+  cep: {
+    type: String,
+    required: true
+  },
+  logradouro: {
+    type: String,
+    required: true
+  },
+  numero: {
+    type: String,
+    required: true
+  },
+  complemento: {
+    type: String,
+    default: ''
+  },
+  bairro: {
+    type: String,
+    required: true
+  },
+  cidade: {
+    type: String,
+    required: true
+  },
+  estado: {
     type: String,
     required: true
   },
@@ -31,15 +56,15 @@ const pedidoSchema = new mongoose.Schema({
   },
   valorPagamento: {
     type: Number,
-    default: 0 
+    default: 0
   },
   troco: {
     type: Number,
-    default: 0 // calculado automaticamente pelo controller
+    default: 0
   },
   valorTotal: {
     type: Number,
-    required: true // calculado automaticamente pelo controller
+    required: true
   },
   status: {
     type: String,
