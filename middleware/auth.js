@@ -35,4 +35,4 @@ const verificarCliente = (req, res, next) => {
   next()
 }
 
-module.exports = { verificarToken, verificarDono, verificarCliente }
+module.exports = { verificarToken, verificarAdmin, verificarCliente }
