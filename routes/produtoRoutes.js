@@ -1,16 +1,20 @@
 const express = require('express')
 const router = express.Router()
+const upload = require('../config/upload')
 const { listarProdutos, listarTodosProdutos, criarProduto, editarProduto, deletarProduto } = require('../controllers/produtoController')
 const { verificarToken, verificarAdmin } = require('../middleware/auth')
 
-// Rota pública — qualquer um pode ver os produtos disponíveis
+// Rota pública
 router.get('/', listarProdutos)
 
-// Rotas protegidas — só o Admin acessa
-// verificarToken verifica se está logado, verificarAdmin verifica se é Admin
+// Rotas protegidas - admin
 router.get('/todos', verificarToken, verificarAdmin, listarTodosProdutos)
-router.post('/', verificarToken, verificarAdmin, criarProduto)
-router.put('/:id', verificarToken, verificarAdmin, editarProduto)
+
+// upload.single('imagem') significa que espera um arquivo com o nome 'imagem'
+router.post('/', verificarToken, verificarAdmin, upload.single('imagem'), criarProduto)
+
+router.put('/:id', verificarToken, verificarAdmin, upload.single('imagem'), editarProduto)
+
 router.delete('/:id', verificarToken, verificarAdmin, deletarProduto)
 
 module.exports = router

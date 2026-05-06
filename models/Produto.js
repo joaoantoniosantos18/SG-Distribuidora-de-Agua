@@ -13,11 +13,15 @@ const produtoSchema = new mongoose.Schema({
   preco: {
     type: Number,
     required: true,
-    min: 0 
+    min: 0
+  },
+  imagemUrl: {
+    type: String,
+    default: '/uploads/produto-padrao.jpg'
   },
   disponivel: {
     type: Boolean,
-    default: true // quando cadastrado, já fica disponível por padrão
+    default: true
   }
 }, {
   timestamps: true
